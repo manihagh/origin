@@ -37,7 +37,7 @@ export class OriginEventListener implements IOriginEventListener {
         this.originLookupAddress = originLookupAddress;
         this.web3 = web3;
         this.emailService = emailService;
-        this.notificationInterval = notificationInterval || 60000; // Default to 1 min intervals
+        this.notificationInterval = notificationInterval || 10000; // Default to 1 min intervals
 
         this.started = false;
         this.interval = null;
@@ -86,6 +86,7 @@ export class OriginEventListener implements IOriginEventListener {
             if (this.newCertificateCounters[ownerEmail] > 0) {
 
                 this.conf.logger.info(`Sending email to ${ownerEmail}...`);
+                const linkToInbox = `${process.env.UI_BASE_URL}/${this.originLookupAddress}/certificates/inbox`;
 
                 const emailTemplate: IEmail = {
                     to: [ownerEmail],
@@ -93,7 +94,7 @@ export class OriginEventListener implements IOriginEventListener {
                     html: `
                         Local issuer approved your certificates. 
                         There are ${this.newCertificateCounters[ownerEmail]} new certificates in your inbox:
-                        ${process.env.UI_BASE_URL}/${this.originLookupAddress}/certificates/inbox
+                        <a href="${linkToInbox}">${linkToInbox}</a>
                     `
                 };
     
@@ -105,10 +106,10 @@ export class OriginEventListener implements IOriginEventListener {
                 }
 
                 this.conf.logger.info('Sent.');
+
+                this.newCertificateCounters[ownerEmail] = 0;
             }
         }
-
-        this.resetCounters();
     }
 
     public resetCounters() {

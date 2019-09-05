@@ -43,7 +43,9 @@ export class MandrillEmailAdapter implements IEmailAdapter {
 
         return {
             success: result[0].status === 'sent',
-            error: result[0].reject_reason ? `Mandrill Error: ${result[0].reject_reason}` : null
+            error: result[0].reject_reason
+                ? `Mandrill Error: ${JSON.stringify(result[0])}`
+                : null
         };
     }
 
